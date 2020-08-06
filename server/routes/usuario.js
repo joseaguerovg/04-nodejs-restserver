@@ -3,10 +3,17 @@ const express = require('express');
 const _ = require('underscore');
 
 const Usuario = require('../models/usuario');
+const auth = require('../middlewares/auth');
 
 const app = express();
 
-app.get('/usuario', (req, res) => {
+app.get('/usuario', auth.verifyToken, (req, res) => {
+
+    return res.json({
+        usuario: req.usuario,
+        nombre: req.usuario.nombre,
+        email: req.usuario.email
+    });
 
     let limite = Number(req.query.limite) || 5;
     let page = Math.max(0, req.query.page);
@@ -36,7 +43,7 @@ app.get('/usuario', (req, res) => {
         });
 });
 
-app.post('/usuario', (req, res) => {
+app.post('/usuario', auth.adminPermission, (req, res) => {
 
     let { nombre, email, password, role } = req.body;
 
@@ -62,7 +69,7 @@ app.post('/usuario', (req, res) => {
     });
 });
 
-app.put('/usuario/:id', (req, res) => {
+app.put('/usuario/:id', auth.adminPermission, (req, res) => {
 
     let id = req.params.id;
     let body = _.pick(req.body, ['nombre', 'email', 'img', 'role', 'estado']);
@@ -83,7 +90,7 @@ app.put('/usuario/:id', (req, res) => {
 
 });
 
-app.delete('/usuario/:id', (req, res) => {
+app.delete('/usuario/:id', auth.adminPermission, (req, res) => {
 
     let id = req.params.id;
     let cambioEstado = {
