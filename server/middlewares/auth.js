@@ -23,36 +23,23 @@ let verifyToken = (req, res, next) => {
 
 };
 
-let adminPermission = (req, res, next) => {
-    let token = req.get('Authorization');
+let verifyAdminRole = (req, res, next) => {
+    let role = req.usuario.role;
 
-    jwt.verify(token, process.env.TOKEN_SEED, (err, decoded) => {
-        if (err) {
-            return res.status(401).json({
-                ok: false,
-                err: {
-                    message: 'Token no válido'
-                }
-            });
-        }
+    if (role != 'ADMIN_ROLE') {
+        return res.status(401).json({
+            ok: false,
+            err: {
+                message: 'No tiene permisos para realizar esta acción'
+            }
+        });
+    }
 
-        if (decoded.usuario.role != 'ADMIN_ROLE') {
-            return res.status(401).json({
-                ok: false,
-                err: {
-                    message: 'No tiene permisos para realizar esta acción'
-                }
-            });
-        }
+    next();
 
-        req.usuario = decoded.usuario;
-
-        next();
-
-    });
 };
 
 module.exports = {
     verifyToken,
-    adminPermission
+    verifyAdminRole
 };

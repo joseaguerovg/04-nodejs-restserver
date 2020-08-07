@@ -9,12 +9,6 @@ const app = express();
 
 app.get('/usuario', auth.verifyToken, (req, res) => {
 
-    return res.json({
-        usuario: req.usuario,
-        nombre: req.usuario.nombre,
-        email: req.usuario.email
-    });
-
     let limite = Number(req.query.limite) || 5;
     let page = Math.max(0, req.query.page);
 
@@ -43,7 +37,7 @@ app.get('/usuario', auth.verifyToken, (req, res) => {
         });
 });
 
-app.post('/usuario', auth.adminPermission, (req, res) => {
+app.post('/usuario', [auth.verifyToken, auth.verifyAdminRole], (req, res) => {
 
     let { nombre, email, password, role } = req.body;
 
@@ -69,7 +63,7 @@ app.post('/usuario', auth.adminPermission, (req, res) => {
     });
 });
 
-app.put('/usuario/:id', auth.adminPermission, (req, res) => {
+app.put('/usuario/:id', [auth.verifyToken, auth.verifyAdminRole], (req, res) => {
 
     let id = req.params.id;
     let body = _.pick(req.body, ['nombre', 'email', 'img', 'role', 'estado']);
@@ -90,7 +84,7 @@ app.put('/usuario/:id', auth.adminPermission, (req, res) => {
 
 });
 
-app.delete('/usuario/:id', auth.adminPermission, (req, res) => {
+app.delete('/usuario/:id', [auth.verifyToken, auth.verifyAdminRole], (req, res) => {
 
     let id = req.params.id;
     let cambioEstado = {
