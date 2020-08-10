@@ -75,7 +75,7 @@ app.put('/categoria/:id', auth.verifyToken, (req, res) => {
 
     let categoria_id = req.params.id;
 
-    Categoria.findByIdAndUpdate(categoria_id, req.body, { new: true }, (err, categoriaDB) => {
+    Categoria.findByIdAndUpdate(categoria_id, req.body, { new: true, runValidators: true }, (err, categoriaDB) => {
         if (err) {
             return res.status(400).json({
                 ok: false,
