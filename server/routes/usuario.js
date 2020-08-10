@@ -23,7 +23,7 @@ app.get('/usuario', auth.verifyToken, (req, res) => {
                 });
             }
 
-            Usuario.count({ estado: true }, (err, count) => {
+            Usuario.countDocuments({ estado: true }, (err, count) => {
                 res.json({
                     ok: true,
                     total: count,
