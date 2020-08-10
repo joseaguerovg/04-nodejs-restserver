@@ -9,6 +9,8 @@ const categoria = require('../models/categoria');
 app.get('/categoria', auth.verifyToken, (req, res) => {
 
     Categoria.find()
+        .populate('usuario', 'nombre email')
+        .sort('nombre')
         .exec((err, categorias) => {
             if (err) {
                 return res.status(400).json({
