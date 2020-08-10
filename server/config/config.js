@@ -16,7 +16,7 @@ if (process.env.NODE_ENV === 'dev') {
 process.env.URL_DB = urlDB;
 
 // Vencimiento token
-process.env.TOKEN_EXPIRE = 60 * 60 * 24 * 30;
+process.env.TOKEN_EXPIRE = '48h';
 
 // Seed de autenticación
 process.env.TOKEN_SEED = process.env.TOKEN_SEED || 'secret-token-dev';
