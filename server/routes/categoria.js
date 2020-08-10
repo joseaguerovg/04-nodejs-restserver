@@ -4,6 +4,7 @@ let app = express();
 
 let auth = require('../middlewares/auth');
 let Categoria = require('../models/categoria');
+const categoria = require('../models/categoria');
 
 app.get('/categoria', auth.verifyToken, (req, res) => {
 
@@ -25,6 +26,22 @@ app.get('/categoria', auth.verifyToken, (req, res) => {
 });
 
 app.get('/categoria/:id', auth.verifyToken, (req, res) => {
+    let categoria_id = req.params.id;
+
+    Categoria.findById(categoria_id, (err, categoriaDB) => {
+        if (err) {
+            return res.status(400).json({
+                ok: false,
+                err
+            });
+        }
+
+        res.json({
+            ok: true,
+            categoria: categoriaDB
+        });
+
+    });
 
 });
 
