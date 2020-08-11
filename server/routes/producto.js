@@ -15,8 +15,8 @@ app.get('/productos', (req, res) => {
     Producto.find({ disponible: true })
         .skip(limite * page)
         .limit(limite)
-        .populate('categoria')
-        .populate('usuario')
+        .populate('categoria', 'nombre')
+        .populate('usuario', 'nombre email')
         .exec((err, productosDB) => {
             if (err) {
                 return res.status(400).json({
@@ -112,7 +112,13 @@ app.put('/productos/:id', (req, res) => {
             });
         }
 
-        Producto.findByIdAndUpdate(id, body, { new: true, runValidators: true }, (err, productoDB) => {
+        productoDB.nombre = body.nombre;
+        productoDB.precioUni = body.precioUni;
+        productoDB.categoria = body.categoria;
+        productoDB.disponible = body.disponible;
+        productoDB.descripcion = body.descripcion;
+
+        productoDB.save((err, productoSave) => {
             if (err) {
                 return res.status(500).json({
                     ok: false,
@@ -122,9 +128,8 @@ app.put('/productos/:id', (req, res) => {
 
             res.json({
                 ok: true,
-                producto: productoDB
+                producto: productoSave
             });
-
         });
 
     });
