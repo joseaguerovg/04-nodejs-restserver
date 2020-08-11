@@ -5,7 +5,7 @@ let app = express();
 let Producto = require('../models/producto');
 
 // Obtener productos
-app.get('/productos', (req, res) => {
+app.get('/productos', verifyToken, (req, res) => {
     // populate: categoria, usuario
     // paginado
 
@@ -39,7 +39,7 @@ app.get('/productos', (req, res) => {
 
 });
 
-app.get('/productos/:id', (req, res) => {
+app.get('/productos/:id', verifyToken, (req, res) => {
     let id = req.params.id;
 
     Producto.findById(id, (err, productoDB) => {
@@ -90,7 +90,7 @@ app.post('/productos', verifyToken, (req, res) => {
 });
 
 // Editar
-app.put('/productos/:id', (req, res) => {
+app.put('/productos/:id', verifyToken, (req, res) => {
 
     let id = req.params.id;
     let body = req.body;
@@ -136,9 +136,8 @@ app.put('/productos/:id', (req, res) => {
 
 });
 
-app.delete('/productos/:id', (req, res) => {
+app.delete('/productos/:id', verifyToken, (req, res) => {
     let id = req.params.id;
-    let disponible = { disponible: false };
 
     Producto.findById(id, (err, productoDB) => {
         if (err) {
@@ -157,7 +156,9 @@ app.delete('/productos/:id', (req, res) => {
             });
         }
 
-        Producto.findByIdAndUpdate(id, disponible, { new: true }, (err, productoDB) => {
+        productoDB.disponible = false;
+
+        productoDB.save((err, productoSave) => {
             if (err) {
                 return res.status(500).json({
                     ok: false,
@@ -167,12 +168,36 @@ app.delete('/productos/:id', (req, res) => {
 
             res.json({
                 ok: true,
-                producto: productoDB
+                producto: productoSave
+            });
+        });
+
+    });
+});
+
+app.get('/productos/buscar/:query', verifyToken, (req, res) => {
+
+    let query = req.params.query;
+
+    let regex = new RegExp(query, 'i');
+
+    Producto.find({ nombre: regex })
+        .populate('categoria', 'nombre')
+        .exec((err, productos) => {
+            if (err) {
+                return res.status(400).json({
+                    ok: false,
+                    err
+                });
+            }
+
+            res.json({
+                ok: true,
+                productos
             });
 
         });
 
-    });
 });
 
 module.exports = app;
